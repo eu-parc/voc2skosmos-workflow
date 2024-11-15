@@ -38,6 +38,12 @@ jobs:
       - name: Install pip dependencies
         run: pip install -r ./requirements.txt
 
+      - name: List files in the repository
+        run: ls -R
+      
+      - name: Ensure rules directory is accessible
+        run: cp ./rules/mappings.yarrrml.yml ${{ github.action_path }}/.
+
       - name: Convert YARRRML to RML
         uses: vemonet/yarrrml-parser@v1.1
         with:
