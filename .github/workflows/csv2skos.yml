@@ -1,0 +1,63 @@
+name: Publish Vocabulary Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  RESOURCE: people
+  VERSION: 0.0.1
+
+jobs:
+  process-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Convert YARRRML to RML
+      - name: Convert YARRRML to RML
+        uses: vemonet/yarrrml-parser@v1.1
+        with:
+          input: rules/mappings.yarrr.yml
+          output: mappings.rml.ttl
+
+      # Execute RML Mapper to generate linked data
+      - name: Run RML mapper
+        uses: vemonet/rmlmapper-java@v4.9.0
+        with:
+          mapping: mappings.rml.ttl
+          output: linked_data.rdf.ttl
+          serialization: turtle
+        env:
+          JAVA_OPTS: "-Xmx6g"
+
+      # Set up Python and install skosify
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install pip dependencies
+        run: pip install skosify
+
+      # Run skosify
+      - name: Run skosify
+        run: | 
+          skosify linked_data.rdf.ttl -o ${{ env.RESOURCE }}.skos.ttl --label "${{ env.RESOURCE }}"
+          cp ${{ env.RESOURCE }}.skos.ttl artifacts/${{ env.RESOURCE }}.skos.ttl
+
+      # Commit and push the generated file
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add artifacts/${env.RESOURCE}.skos.ttl
+          git commit -m "Add generated ${env.RESOURCE}.skos.ttl"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

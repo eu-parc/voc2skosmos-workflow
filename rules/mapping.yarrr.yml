@@ -1,0 +1,26 @@
+prefixes:
+  ex: http://www.example.com/
+  e: http://myontology.com/
+  dbo: http://dbpedia.org/ontology/
+  grel: http://users.ugent.be/~bjdmeest/function/grel.ttl#
+
+mappings:
+  people:
+    sources:
+      - ['data/people.csv~csv']
+    s: ex:$(id)
+    po:
+      - [a, schema:Person]
+      - [schema:givenName, $(firstname)]
+      - [schema:familyName, $(lastname)]
+      - p: e:debutEpisode
+        o:
+          value: $(debut episode)
+          datatype: xsd:integer
+      - p: dbo:hairColor
+        o:
+          function: grel:toUpperCase
+          parameters:
+            - [grel:valueParameter, $(hair color)]
+          language: en
+
