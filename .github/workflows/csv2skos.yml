@@ -38,6 +38,9 @@ jobs:
       - name: Install pip dependencies
         run: pip install -r ./requirements.txt
 
+      - name: List dir content
+        run: ls -R ${{ github.workspace }} 
+
       - name: Convert YARRRML to RML
         uses: vemonet/yarrrml-parser@v1.1
         with:
