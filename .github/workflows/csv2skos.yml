@@ -38,14 +38,19 @@ jobs:
       - name: Install pip dependencies
         run: pip install -r ./requirements.txt
 
-      - name: List dir content
-        run: ls -R ${{ github.workspace }} 
-
       - name: Convert YARRRML to RML
         uses: vemonet/yarrrml-parser@v1.1
         with:
           input: ${{ github.workspace }}/rules/mappings.yarrr.yml
           output: mappings.rml.ttl
+
+      - name: Cache RML Mapper
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-cache
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Run RML mapper
         uses: vemonet/rmlmapper-java@v4.9.0
