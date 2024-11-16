@@ -29,14 +29,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'pip'
 
       - name: Install pip dependencies
         run: pip install -r ./requirements.txt
@@ -46,6 +39,15 @@ jobs:
         with:
           input: ./rules/mappings.yarrr.yml
           output: mappings.rml.ttl
+
+      - name: Cache RML Mapper
+        uses: actions/cache@v3
+        with:
+          path: | 
+            ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ env.RESOURCE }}
+          restore-keys: |
+            ${{ runner.os }}-rmlmapper-
 
       - name: Run RML mapper
         uses: vemonet/rmlmapper-java@v4.9.0
