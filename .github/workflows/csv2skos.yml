@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
   pull_request:
+  release:
+    types: [published]
 
 env:
   RESOURCE: people
   VERSION: 0.0.1
 
 jobs:
-  process-data:
+  csv-to-skos:
     runs-on: ubuntu-latest
-
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.6.0
@@ -38,9 +41,6 @@ jobs:
       - name: Install pip dependencies
         run: pip install -r ./requirements.txt
 
-      - name: where am I
-        run: pwd
-
       - name: Convert YARRRML to RML
         uses: vemonet/yarrrml-parser@v1.1
         with:
@@ -59,13 +59,31 @@ jobs:
       - name: Run skosify
         run: | 
           skosify linked_data.rdf.ttl -o ${{ env.RESOURCE }}.skos.ttl --label "${{ env.RESOURCE }}"
-          cp ${{ env.RESOURCE }}.skos.ttl ./artifacts/${{ env.RESOURCE }}.skos.ttl
 
+      - name: Upload vocabulary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.RESOURCE }}.skos.ttl 
+          path: .
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: ['csv-to-skos']
+    steps:
+      - name: Download vocabulary
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.RESOURCE }}.skos.ttl
+          path: .
+      - name: Move to artifacts
+        run: | 
+          mkdir -p artifacts
+          cp *.skos.ttl artifacts/.
       - name: Commit and push changes
+        if: github.event_name == 'release'
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          mkdir -p ./artifacts
           git add artifacts/${env.RESOURCE}.skos.ttl
           git commit -m "Add generated ${env.RESOURCE}.skos.ttl"
           git push
