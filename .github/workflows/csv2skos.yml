@@ -1,18 +1,11 @@
 name: Publish Vocabulary Workflow
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - '*'
-  pull_request:
-  release:
-    types: [published]
-
-env:
-  RESOURCE: voc
-  VERSION: 0.0.1
+  workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
 
 jobs:
   csv-to-skos:
@@ -39,14 +32,6 @@ jobs:
         with:
           input: ./rules/mappings.yarrr.yml
           output: mappings.rml.ttl
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /usr/bin/docker
-          key: ${{ runner.os }}-docker-rmlmapper
-          restore-keys: |
-            ${{ runner.os }}-docker-
           
       - name: Run RML mapper
         uses: vemonet/rmlmapper-java@v4.9.0
@@ -59,12 +44,12 @@ jobs:
 
       - name: Run skosify
         run: | 
-          skosify linked_data.rdf.ttl -o ${{ env.RESOURCE }}.skos.ttl --label "example"
+          skosify linked_data.rdf.ttl -o voc.skos.ttl --label "example"
 
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.RESOURCE }}.skos.ttl
+          name: voc.skos.ttl
           path: .
 
   publish:
@@ -74,7 +59,7 @@ jobs:
       - name: Download vocabulary
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.RESOURCE }}.skos.ttl
+          name: voc.skos.ttl
           path: .
       - name: Move to artifacts
         run: | 
@@ -85,8 +70,8 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add artifacts/${{ env.RESOURCE }}.skos.ttl
-          git commit -m "Add generated ${{ env.RESOURCE }}.skos.ttl"
+          git add artifacts/voc.skos.ttl
+          git commit -m "Add generated voc.skos.ttl"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

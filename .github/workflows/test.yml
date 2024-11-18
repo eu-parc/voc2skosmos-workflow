@@ -1,0 +1,13 @@
+name: Test Publish Vocabulary Workflow
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+
+jobs:
+    test-workflow:
+        uses: ./.github/workflows/csv2skos.yml@main
+
