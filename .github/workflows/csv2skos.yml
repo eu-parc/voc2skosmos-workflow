@@ -11,7 +11,7 @@ on:
     types: [published]
 
 env:
-  RESOURCE: people
+  RESOURCE: voc
   VERSION: 0.0.1
 
 jobs:
@@ -85,8 +85,8 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add artifacts/${env.RESOURCE}.skos.ttl
-          git commit -m "Add generated ${env.RESOURCE}.skos.ttl"
+          git add artifacts/${{ env.RESOURCE }}.skos.ttl
+          git commit -m "Add generated ${{ env.RESOURCE }}.skos.ttl"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
