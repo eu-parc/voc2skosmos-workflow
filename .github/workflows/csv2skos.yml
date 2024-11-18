@@ -60,7 +60,7 @@ jobs:
 
       - name: Run skosify
         run: | 
-          skosify linked_data.rdf.ttl -o ${{ env.RESOURCE }}.skos.ttl --label "${{ env.RESOURCE }}"
+          skosify linked_data.rdf.ttl -o ${{ env.RESOURCE }}.skos.ttl --label "example"
 
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
