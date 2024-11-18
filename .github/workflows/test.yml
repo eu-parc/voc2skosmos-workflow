@@ -9,5 +9,5 @@ on:
 
 jobs:
     test-workflow:
-        uses: ./.github/workflows/csv2skos.yml@main
+        uses: ./.github/workflows/csv2skos.yml
 
