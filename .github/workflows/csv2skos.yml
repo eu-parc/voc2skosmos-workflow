@@ -40,25 +40,13 @@ jobs:
           input: ./rules/mappings.yarrr.yml
           output: mappings.rml.ttl
 
-      - name: Cache RML Mapper
-        id: cache-rmlmapper
+      - name: Cache Docker layers
         uses: actions/cache@v3
         with:
-          path: | 
-            ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ env.RESOURCE }}
+          path: /usr/bin/docker
+          key: ${{ runner.os }}-docker-rmlmapper
           restore-keys: |
-            ${{ runner.os }}-rmlmapper-
-      
-      - name: Run RML mapper to populate cache
-        if: steps.cache-rmlmapper.outputs.cache-hit != 'true'
-        uses: vemonet/rmlmapper-java@v4.9.0
-        with:
-          mapping: mappings.rml.ttl
-          output: linked_data.rdf.ttl
-          serialization: turtle
-        env:
-          JAVA_OPTS: "-Xmx6g"
+            ${{ runner.os }}-docker-
           
       - name: Run RML mapper
         uses: vemonet/rmlmapper-java@v4.9.0
