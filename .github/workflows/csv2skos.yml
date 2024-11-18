@@ -41,6 +41,7 @@ jobs:
           output: mappings.rml.ttl
 
       - name: Cache RML Mapper
+        id: cache-rmlmapper
         uses: actions/cache@v3
         with:
           path: | 
@@ -48,7 +49,17 @@ jobs:
           key: ${{ runner.os }}-maven-${{ env.RESOURCE }}
           restore-keys: |
             ${{ runner.os }}-rmlmapper-
-
+      
+      - name: Run RML mapper to populate cache
+        if: steps.cache-rmlmapper.outputs.cache-hit != 'true'
+        uses: vemonet/rmlmapper-java@v4.9.0
+        with:
+          mapping: mappings.rml.ttl
+          output: linked_data.rdf.ttl
+          serialization: turtle
+        env:
+          JAVA_OPTS: "-Xmx6g"
+          
       - name: Run RML mapper
         uses: vemonet/rmlmapper-java@v4.9.0
         with:
@@ -65,7 +76,7 @@ jobs:
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.RESOURCE }}.skos.ttl 
+          name: ${{ env.RESOURCE }}.skos.ttl
           path: .
 
   publish:
