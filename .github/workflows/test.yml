@@ -10,4 +10,7 @@ on:
 jobs:
     test-workflow:
         uses: ./.github/workflows/csv2skos.yml
+        with:
+            namespace: http://www.example.com/
+            namespace_label: example
 

@@ -6,6 +6,12 @@ on:
       version:
         required: false
         type: string
+      namespace_label:
+        required: true
+        type: string
+      namespace:
+        required: true
+        type: string
 
 jobs:
   csv-to-skos:
@@ -44,7 +50,7 @@ jobs:
 
       - name: Run skosify
         run: | 
-          skosify linked_data.rdf.ttl -o voc.skos.ttl --label "example"
+          skosify linked_data.rdf.ttl -o voc.skos.ttl --label "${{ inputs.namespace_label}}" --namespace "${{ inputs.namespace}}" --set-modified
 
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
