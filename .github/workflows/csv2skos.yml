@@ -3,6 +3,9 @@ name: Publish Vocabulary Workflow
 on:
   workflow_call:
     inputs:
+      ref:
+        required: true
+        type: string
       version:
         required: false
         type: string
@@ -12,7 +15,10 @@ on:
       namespace:
         required: true
         type: string
-
+    secrets:
+        token:
+          required: true
+          
 jobs:
   csv-to-skos:
     runs-on: ubuntu-latest
@@ -23,6 +29,9 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
