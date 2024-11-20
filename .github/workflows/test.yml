@@ -11,6 +11,9 @@ jobs:
     test-workflow:
         uses: ./.github/workflows/csv2skos.yml
         with:
+            ref: ${{ github.ref }}
             namespace: http://www.example.com/
             namespace_label: example
+        secrets:
+            token: ${{ secrets.GITHUB_TOKEN }}
 
