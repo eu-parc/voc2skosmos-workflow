@@ -1,0 +1,95 @@
+id: http://www.example.com/personinfo
+name: people-schema
+description: people dataset schema
+imports:
+- linkml:types
+prefixes:
+  ex: http://www.example.com/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  skos: http://www.w3.org/2004/02/skos/core#
+  dbo: http://dbpedia.org/ontology/
+  xsd: http://www.w3.org/2001/XMLSchema#
+  thesoz: http://lod.gesis.org/thesoz/
+default_range: string
+default_prefix: ex
+
+emit_prefixes:
+  - ex
+  - linkml
+  - schema
+  - rdfs
+  - skos
+  - dbo
+  - xsd
+
+classes:
+  Person:
+    description: >-
+      A person (alive, dead, undead, or fictional).
+    class_uri: skos:Concept
+    mixins:
+      - HasTranslations
+    slots:
+      - id
+      - first_name
+      - last_name
+      - debut_episode
+      - hair_color
+    exact_mappings: schema:Person
+
+  HasTranslations:
+    class_uri: thesoz:hasTranslation
+    mixin: true
+    slots:
+      - translations
+  Translation:
+    slots:
+      - property_name
+      - language
+      - translated_value
+  Data:
+    tree_root: true
+    attributes:
+      persons:
+        multivalued: true
+        inlined_as_list: true
+        range: Person
+
+slots:
+  id:
+    identifier: true
+    slot_uri: schema:identifier
+  first_name:
+    slot_uri: schema:givenName
+    range: string
+  last_name:
+    range: string
+    slot_uri: schema:familyName
+  debut_episode:
+    range: integer
+    slot_uri: ex:debutEpisode
+  hair_color:
+    structured_aliases:
+      - literal_form: hair color
+        in_language: en
+    slot_uri: dbo:hairColor
+    range: HairColor
+  translations:
+    multivalued: true
+    inlined_as_list: true
+    range: Translation
+  property_name:
+  language:  
+  translated_value:
+
+enums:
+  HairColor:
+    permissible_values:
+      pink:
+      black:
+      blonde:
+      dark blue:
+      brown:
+      scarlet:

@@ -8,13 +8,24 @@ on:
 
 
 jobs:
-    test-workflow:
+    test-workflow-csv:
         uses: ./.github/workflows/csv2skos.yml
         with:
             ref: ${{ github.ref }}
             namespace: http://www.example.com/
             namespace_label: example
             mappings_file: rules/mappings.yarrr.yml
+        secrets:
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+    test-workflow-yml:
+        uses: ./.github/workflows/yml2skos.yml
+        with:
+            ref: ${{ github.ref }}
+            namespace: http://www.example.com/
+            namespace_label: example
+            linkml_schema: schema/people.linkml.yml
+            data: data/people.yml
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}
 
