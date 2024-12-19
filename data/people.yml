@@ -1,0 +1,61 @@
+persons:
+  - id: ex:0
+    first_name: Natsu
+    last_name: Dragneel
+    translations:
+    - language: nl-be
+      property_name: last_name
+      translated_value: Peeters
+    - language: nl-be
+      property_name: first_name
+      translated_value: Benny 
+    debut_episode: 1
+    hair_color: pink
+  - id: ex:1
+    first_name: Gray
+    last_name: Fullbuster
+    translations:
+    - language: nl-be
+      property_name: last_name
+      translated_value: Volbuster
+    - language: nl-be
+      property_name: first_name
+      translated_value: Grijs 
+    debut_episode: 2
+    hair_color: dark blue
+  - id: ex:2
+    first_name: Gajeel
+    last_name: Redfox
+    translations:
+    - language: nl-be
+      property_name: last_name
+      translated_value: Rooivos
+    - language: nl-be
+      property_name: first_name
+      translated_value: Bobbette
+    debut_episode: 21
+    hair_color: black
+  - id: ex:3
+    first_name: Lucy
+    last_name: Heartfilia
+    translations:
+    - language: nl-be
+      property_name: last_name
+      translated_value: Hartmans
+    - language: nl-be
+      property_name: first_name
+      translated_value: Loes
+    debut_episode: 1
+    hair_color: blonde
+  - id: ex:4
+    first_name: Ezra
+    last_name: Scarlet
+    translations:
+    - language: nl-be
+      property_name: last_name
+      translated_value: Scharlaken
+    - language: nl-be
+      property_name: first_name
+      translated_value: Esther
+    debut_episode: 4
+    hair_color: scarlet

@@ -1,4 +1,4 @@
-name: Publish Vocabulary Workflow from csv
+name: Publish Vocabulary Workflow from yml
 
 on:
   workflow_call:
@@ -15,7 +15,10 @@ on:
       namespace:
         required: true
         type: string
-      mappings_file:
+      linkml_schema:
+        required: true
+        type: string
+      data:
         required: true
         type: string
       
@@ -24,7 +27,7 @@ on:
           required: true
           
 jobs:
-  csv-to-skos:
+  yml-to-skos:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -45,40 +48,38 @@ jobs:
           cache: 'pip'
 
       - name: Install pip dependencies
-        run: pip install skosify
+        run: pip install skosify linkml
 
-      - name: Convert YARRRML to RML
-        uses: vemonet/yarrrml-parser@v1.1
-        with:
-          input: ${{ inputs.mappings_file }}
-          output: mappings.rml.ttl
-          
-      - name: Run RML mapper
-        uses: vemonet/rmlmapper-java@v4.9.0
-        with:
-          mapping: mappings.rml.ttl
-          output: linked_data.rdf.ttl
-          serialization: turtle
-        env:
-          JAVA_OPTS: "-Xmx6g"
+      - name: Convert yml to rdf
+        run: |
+          linkml-convert --schema "${{ inputs.linkml_schema}}" -t ttl "${{ inputs.data}}" > linked_data.rdf.ttl
 
+      - name: Add language annotations
+        run: |
+           python3 rules/language.py \
+            -s ${{ inputs.linkml_schema }} \
+            -d ${{ inputs.data }} \
+            -t linked_data.rdf.ttl \
+            -n "${{ inputs.namespace}}" \
+            -o language_annotated.rdf.ttl
+      
       - name: Run skosify
         run: |
-          skosify linked_data.rdf.ttl -o voc.skos.ttl \
-            --label "${{ inputs.namespace_label}}" \
+          skosify language_annotated.rdf.ttl -o voc.skos.ttl \
             --namespace "${{ inputs.namespace}}" \
             --set-modified \
+            --cleanup-unreachable \
             -l en
-
+      
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
         with:
-          name: voc-from-csv.skos.ttl
+          name: voc-from-yml.skos.ttl
           path: ./voc.skos.ttl
 
       - name: Publish  
         if: github.event_name == 'release'
         uses: ./.github/workflows/skosmos_upload.yml
         with:
-          artifact: voc-from-csv.skos.ttl
+          artifact: voc-from-yml.skos.ttl
           token: ${{ secrets.GITHUB_TOKEN }}
