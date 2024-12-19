@@ -60,7 +60,7 @@ jobs:
             -s ${{ inputs.linkml_schema }} \
             -d ${{ inputs.data }} \
             -t linked_data.rdf.ttl \
-            -n "${{ inputs.namespace}}"
+            -n "${{ inputs.namespace}}" \
             -o language_annotated.rdf.ttl
       
       - name: Run skosify
@@ -74,11 +74,12 @@ jobs:
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
         with:
-          name: voc.skos.ttl
+          name: voc-from-yml.skos.ttl
           path: ./voc.skos.ttl
 
       - name: Publish  
         if: github.event_name == 'release'
         uses: ./.github/workflows/skosmos_upload.yml
         with:
+          artifact: voc-from-yml.skos.ttl
           token: ${{ secrets.GITHUB_TOKEN }}

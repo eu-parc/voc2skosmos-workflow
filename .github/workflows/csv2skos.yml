@@ -73,12 +73,12 @@ jobs:
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
         with:
-          name: voc.skos.ttl
+          name: voc-from-csv.skos.ttl
           path: ./voc.skos.ttl
 
-  publish:
-    if: github.event_name == 'release'
-    needs: ['csv-to-skos']
-    uses: ./.github/workflows/skosmos_upload.yml
-    secrets:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish  
+        if: github.event_name == 'release'
+        uses: ./.github/workflows/skosmos_upload.yml
+        with:
+          artifact: voc-from-csv.skos.ttl
+          token: ${{ secrets.GITHUB_TOKEN }}

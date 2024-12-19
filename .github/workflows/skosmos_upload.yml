@@ -2,6 +2,10 @@ name: Upload Vocabulary to Skosmos
 
 on:
   workflow_call:
+    inputs:
+      artifact:
+        required: true
+        type: string
     secrets:
         token:
           required: true
@@ -17,7 +21,7 @@ jobs:
       - name: Download vocabulary
         uses: actions/download-artifact@v4
         with:
-          name: voc.skos.ttl
+          name: ${{ inputs.artifact}}
           path: .
       - name: Move to artifacts
         run: | 
@@ -27,7 +31,7 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add artifacts/voc.skos.ttl
+          git add artifacts/${{ inputs.namespace}}
           git commit -m "Add generated voc.skos.ttl"
           git push
         env:
