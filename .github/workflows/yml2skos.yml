@@ -54,9 +54,13 @@ jobs:
         run: |
           linkml-convert --schema "${{ inputs.linkml_schema}}" -t ttl "${{ inputs.data}}" > linked_data.rdf.ttl
 
+      - name: Download language.py
+        run: |
+          curl -o language.py https://raw.githubusercontent.com/eu-parc/voc2skosmos-workflow/main/rules/language.py
+        
       - name: Add language annotations
         run: |
-           python3 rules/language.py \
+           python3 language.py \
             -s ${{ inputs.linkml_schema }} \
             -d ${{ inputs.data }} \
             -t linked_data.rdf.ttl \
