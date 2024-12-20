@@ -31,7 +31,7 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add artifacts/${{ inputs.namespace}}
+          git add artifacts/${{ inputs.artifact}}
           git commit -m "Add generated voc.skos.ttl"
           git push
         env:
