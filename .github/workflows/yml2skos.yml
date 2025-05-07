@@ -64,7 +64,7 @@ jobs:
 
       - name: Convert yml to rdf
         run: |
-          linkml-convert --schema ./schema.linkml.yml -t ttl "${{ inputs.data}}" > linked_data.rdf.ttl
+          linkml-convert --schema ./schema.linkml.yml -t ttl "${{ inputs.data}}" -P "_base=${{ inputs.namespace}}" > linked_data.rdf.ttl
 
       - name: Download language.py
         run: |
