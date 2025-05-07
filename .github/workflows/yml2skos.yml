@@ -50,9 +50,21 @@ jobs:
       - name: Install pip dependencies
         run: pip install skosify linkml
 
+      - name: Process schema (download or copy)
+        run: |
+          if [[ "${{ inputs.linkml_schema }}" == http* ]]; then
+            # If it's a URL, download the schema
+            echo "Schema is a URL. Downloading..."
+            curl -L "${{ inputs.linkml_schema }}" -o ./schema.linkml.yml
+          else
+            # If it's a file path, copy the schema
+            echo "Schema is a file path. Copying..."
+            cp "${{ inputs.linkml_schema }}" ./schema.linkml.yml
+          fi
+
       - name: Convert yml to rdf
         run: |
-          linkml-convert --schema "${{ inputs.linkml_schema}}" -t ttl "${{ inputs.data}}" > linked_data.rdf.ttl
+          linkml-convert --schema ./schema.linkml.yml -t ttl "${{ inputs.data}}" > linked_data.rdf.ttl
 
       - name: Download language.py
         run: |
@@ -61,7 +73,7 @@ jobs:
       - name: Add language annotations
         run: |
            python3 language.py \
-            -s ${{ inputs.linkml_schema }} \
+            -s ./schema.linkml.yml \
             -d ${{ inputs.data }} \
             -t linked_data.rdf.ttl \
             -n "${{ inputs.namespace}}" \
