@@ -19,7 +19,10 @@ on:
         required: true
         type: string
       data:
-        required: true
+        required: false
+        type: string
+      artefact_name:
+        required: false
         type: string
       
     secrets:
@@ -40,6 +43,24 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           token: ${{ secrets.token }}
+
+      - name: Set data file path
+        id: data-path
+        run: |
+          if [ -n "${{ inputs.artefact_name }}" ]; then
+            echo "Downloading artifact: ${{ inputs.artefact_name }}"
+            echo "data_file=./downloaded-artifacts/${{ inputs.artefact_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "Using file from repo: ${{ inputs.data }}"
+            echo "data_file=${{ inputs.data }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download artifact if needed
+        if: inputs.artefact_name != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artefact_name }}
+          path: ./downloaded-artifacts
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -64,7 +85,7 @@ jobs:
 
       - name: Convert yml to rdf
         run: |
-          linkml-convert --schema ./schema.linkml.yml -t ttl "${{ inputs.data}}" -P "_base=${{ inputs.namespace}}" > linked_data.rdf.ttl
+          linkml-convert --schema ./schema.linkml.yml -t ttl -P "_base=${{ inputs.namespace}}" "${{ inputs.data}}" > linked_data.rdf.ttl
 
       - name: Download language.py
         run: |
