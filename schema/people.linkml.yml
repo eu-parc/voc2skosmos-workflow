@@ -5,6 +5,7 @@ imports:
 - linkml:types
 prefixes:
   ex: http://www.example.com/
+  people: http://www.people.com/
   linkml: https://w3id.org/linkml/
   schema: http://schema.org/
   rdfs: http://www.w3.org/2000/01/rdf-schema#
@@ -16,6 +17,7 @@ default_range: string
 default_prefix: ex
 
 emit_prefixes:
+  - people
   - ex
   - linkml
   - schema
@@ -28,7 +30,7 @@ classes:
   Person:
     description: >-
       A person (alive, dead, undead, or fictional).
-    class_uri: skos:Concept
+    class_uri: schema:Person
     mixins:
       - HasTranslations
     slots:
@@ -37,7 +39,7 @@ classes:
       - last_name
       - debut_episode
       - hair_color
-    exact_mappings: schema:Person
+    # exact_mappings: schema:Person # THIS IS LOST IN THE LINKML TO RDF TRANSLATION
 
   HasTranslations:
     class_uri: thesoz:hasTranslation
@@ -81,6 +83,7 @@ slots:
     inlined_as_list: true
     range: Translation
   property_name:
+    slot_uri: schema:identifier
   language:  
   translated_value:
 
