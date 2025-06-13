@@ -1,5 +1,5 @@
 persons:
-  - id: ex:0
+  - id: people:0
     first_name: Natsu
     last_name: Dragneel
     translations:
@@ -11,7 +11,7 @@ persons:
       translated_value: Benny 
     debut_episode: 1
     hair_color: pink
-  - id: ex:1
+  - id: people:1
     first_name: Gray
     last_name: Fullbuster
     translations:
@@ -23,7 +23,7 @@ persons:
       translated_value: Grijs 
     debut_episode: 2
     hair_color: dark blue
-  - id: ex:2
+  - id: people:2
     first_name: Gajeel
     last_name: Redfox
     translations:
@@ -35,7 +35,7 @@ persons:
       translated_value: Bobbette
     debut_episode: 21
     hair_color: black
-  - id: ex:3
+  - id: people:3
     first_name: Lucy
     last_name: Heartfilia
     translations:
@@ -47,7 +47,7 @@ persons:
       translated_value: Loes
     debut_episode: 1
     hair_color: blonde
-  - id: ex:4
+  - id: people:4
     first_name: Ezra
     last_name: Scarlet
     translations:

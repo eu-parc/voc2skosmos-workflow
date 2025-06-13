@@ -23,7 +23,8 @@ jobs:
         with:
             ref: ${{ github.ref }}
             namespace: http://www.example.com/
-            namespace_label: example
+            voc_uri: http://www.example.com/person-vocabulary
+            entity_name: Person
             linkml_schema: schema/people.linkml.yml
             data: data/people.yml
         secrets:

@@ -9,10 +9,13 @@ on:
       version:
         required: false
         type: string
-      namespace_label:
+      namespace:
         required: true
         type: string
-      namespace:
+      voc_uri:
+        required: true
+        type: string
+      entity_name:
         required: true
         type: string
       linkml_schema:
@@ -83,30 +86,65 @@ jobs:
             cp "${{ inputs.linkml_schema }}" ./schema.linkml.yml
           fi
 
+      - name: Set up skosify.py
+        id: skosify-script
+        run: |
+          if [[ "${{ github.repository }}" == "eu-parc/voc2skosmos-workflow" ]]; then
+            cp rules/skosify.py skosify.py
+            echo "Used local skosify.py"
+          else
+            curl -o skosify.py https://raw.githubusercontent.com/eu-parc/voc2skosmos-workflow/main/rules/skosify.py
+            echo "Downloaded skosify.py"
+          fi
+      
+      - name: Add skos:Concept as class_uri to schema
+        run: |
+          python3 skosify.py \
+          -s ./schema.linkml.yml \
+          -e "${{ inputs.entity_name }}" \
+          -o schema.skos.linkml.yml
+      
       - name: Convert yml to rdf
         run: |
-          linkml-convert --schema ./schema.linkml.yml -t ttl -P "_base=${{ inputs.namespace}}" "${{ steps.data-path.outputs.data_file }}" > linked_data.rdf.ttl
-
-      - name: Download language.py
+          linkml-convert --schema ./schema.skos.linkml.yml -t ttl -P "_base=${{ inputs.namespace}}" "${{ steps.data-path.outputs.data_file }}" > linked_data.rdf.ttl
+        
+      - name: Set up language.py
+        id: language-script
         run: |
-          curl -o language.py https://raw.githubusercontent.com/eu-parc/voc2skosmos-workflow/main/rules/language.py
+          if [[ "${{ github.repository }}" == "eu-parc/voc2skosmos-workflow" ]]; then
+            cp rules/language.py language.py
+            echo "Used local language.py"
+          else
+            curl -o language.py https://raw.githubusercontent.com/eu-parc/voc2skosmos-workflow/main/rules/language.py
+            echo "Downloaded language.py"
+          fi
         
       - name: Add language annotations
         run: |
            python3 language.py \
-            -s ./schema.linkml.yml \
+            -s ./schema.skos.linkml.yml \
             -d ${{ steps.data-path.outputs.data_file }} \
             -t linked_data.rdf.ttl \
-            -n "${{ inputs.namespace}}" \
             -o language_annotated.rdf.ttl
       
       - name: Run skosify
         run: |
           skosify language_annotated.rdf.ttl -o voc.skos.ttl \
-            --namespace "${{ inputs.namespace}}" \
+            --namespace "${{ inputs.voc_uri}}" \
             --set-modified \
             --cleanup-unreachable \
             -l en
+
+      - name: Ensure voc.skos.ttl is meaningful
+        run: |
+          if [ ! -f voc.skos.ttl ]; then
+            echo "Error: voc.skos.ttl does not exist."
+            exit 1
+          fi
+          if ! grep -q -E '^\s*[^@#]+\s+[^@#]+\s+[^@#]+\s*\.' voc.skos.ttl; then
+            echo "Error: voc.skos.ttl appears to contain no RDF triples."
+            exit 1
+          fi
       
       - name: Upload vocabulary
         uses: actions/upload-artifact@v4
